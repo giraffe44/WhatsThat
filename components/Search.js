@@ -1,18 +1,19 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import { AuthContext } from '../App.js'
+import {SEARCH_USERS, ADD_CONTACT} from '../config'
 
-const Search = () => {
+const Search = ({navigation}) => {
   const [searchStr, setSearchStr] = useState('')
   const [users, setUsers] = useState([])
-  const {token} = useContext(AuthContext);
+  const {userToken} = useContext(AuthContext);
 
   useEffect(() => {
-    fetch(`http://localhost:3333/api/1.0.0/search?q=${searchStr}`, {
+    fetch(SEARCH_USERS(searchStr), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Authorization': token
+        'X-Authorization': userToken
       },
     })
       .then(response => response.json())
@@ -38,7 +39,7 @@ const Search = () => {
           <View key={user.user_id}>
             <Text style={{marginVertical: 10}} key={user.user_id}>{user.family_name} {user.given_name} {user.email}</Text>
             <Button title={`Add ${user.given_name} as contact`} onPress={() => {
-              fetch(`http://localhost:3333/api/1.0.0/user/${user.user_id}/contact`, {
+              fetch(ADD_CONTACT(user.user_id), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

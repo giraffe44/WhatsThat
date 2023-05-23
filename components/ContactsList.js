@@ -1,17 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Button, Text } from 'react-native';
 import { AuthContext } from '../App';
+import { GET_CONTACTS, ADD_CONTACT } from '../config';
 
-const ContactsList = () => {
+const ContactsList = ({navigation}) => {
   const [contacts, setContacts] = useState([])
-  const {token} = useContext(AuthContext);
+  const {userToken} = useContext(AuthContext);
 
   useEffect(() => {
-    fetch(`http://localhost:3333/api/1.0.0/contacts`, {
+    fetch(GET_CONTACTS, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Authorization': token
+        'X-Authorization': userToken
       },
     })
       .then(response => response.json())
@@ -30,7 +31,7 @@ const ContactsList = () => {
         return (
           <View key={user.user_id}>
             <Button title={`Chat with ${user.first_name} ${user.last_name}`} onPress={() => {
-              fetch(`http://localhost:3333/api/1.0.0/user/${user.user_id}/contact`, {
+              fetch(ADD_CONTACT(user.user_id), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

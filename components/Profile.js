@@ -1,20 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import { AuthContext } from '../App';
+import {GET_USER} from '../config'
 
-const Profile = () => {
+const Profile = ({navigation}) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
-
-  const {token, userId} = useContext(AuthContext);
+  const {userToken, userId} = useContext(AuthContext);
 
   useEffect(() => {
-    fetch(`http://localhost:3333/api/1.0.0/user/${userId}`, {
+    fetch(GET_USER(userId), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Authorization': token
+        'X-Authorization': userToken
       },
     })
       .then(response => response.json())
@@ -46,7 +46,7 @@ const Profile = () => {
         value={email}
       />
       <Button title="Save" onPress={() => {
-        fetch(`http://localhost:3333/api/1.0.0/user/${userId}`, {
+        fetch(UPDATE_USER(userId), {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import {AuthContext} from '../App.js'
+import {LOGIN} from '../config'
 
-const Login = () => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const {token} = useContext(AuthContext);
-
+  const {isUserLoggedIn, userLogin} = useContext(AuthContext);
 
   return (
     <View>
@@ -21,7 +21,7 @@ const Login = () => {
         value={password}
       />
       <Button title="Login" onPress={() => {
-        fetch('http://localhost:3333/api/1.0.0/login', {
+        fetch(LOGIN, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,12 @@ const Login = () => {
         })
           .then(response => response.json())
           .then(data => {
-            navigation.navigate('ChatList')
+            userLogin({
+              userToken: data.token,
+              userId: data.id,
+            })
+            navigation.push('ChatList')
+            // navigation.navigate('ChatList')
             console.log('Response:', data);
           })
           .catch(error => {
@@ -43,7 +48,7 @@ const Login = () => {
       />
 
       <Text
-        onPress={() => navigation.navigate('Signup')}
+        onPress={() => navigation.push('Signup')}
       >
         New here? Create an account
       </Text>

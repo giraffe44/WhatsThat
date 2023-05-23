@@ -2,28 +2,28 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { AuthContext } from '../App.js'
+import { GET_CHAT, SEND_MESSAGE } from '../config.js';
 
 
-const Chat = () => {
+const Chat = ({navigation}) => {
   const [message, setMessage] = useState('')
   const [chat, setChat] = useState({})
   
-  const {token} = useContext(AuthContext);
+  const {userToken} = useContext(AuthContext);
 
   const route = useRoute();
   const chatId = route.params.chatId
 
   useEffect(() => {
-    fetch(`http://localhost:3333/api/1.0.0/chat/${chatId}`, {
+    fetch(GET_CHAT(chat_id), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Authorization': token
+        'X-Authorization': userToken
       },
     })
       .then(response => response.json())
       .then(chat => {
-        console.log(chat)
         setChat(chat)
       })
       .catch(error => {
@@ -54,7 +54,7 @@ const Chat = () => {
       />
 
       <Button disabled={!message} title={`Send message`} onPress={() => {
-        fetch(`http://localhost:3333/api/1.0.0/chat/${chatId}/message`, {
+        fetch(SEND_MESSAGE(chatId), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

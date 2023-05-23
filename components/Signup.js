@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
+import { CREATE_USER } from '../config';
 
 const createUser = async (firstName, lastName, email, password, setError) => {
   try {
-    const response = await fetch('http://localhost:3333/api/1.0.0/user', {
+    const response = await fetch(CREATE_USER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +32,8 @@ const createUser = async (firstName, lastName, email, password, setError) => {
     console.log(e)
   }
 }
-const Signup = () => {
+
+const Signup = ({navigation}) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
