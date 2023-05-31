@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
+import { View, TextInput, Button, Text, ScrollView } from 'react-native';
 import { AuthContext } from '../App.js'
-import {SEARCH_USERS, ADD_CONTACT} from '../config'
+import { SEARCH_USERS, ADD_CONTACT } from '../config'
 
-const Search = ({navigation}) => {
+const Search = () => {
   const [searchStr, setSearchStr] = useState('')
   const [users, setUsers] = useState([])
-  const {userToken} = useContext(AuthContext);
+  const { userToken } = useContext(AuthContext);
 
   useEffect(() => {
     fetch(SEARCH_USERS(searchStr), {
@@ -27,42 +27,40 @@ const Search = ({navigation}) => {
   }, [searchStr]);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <TextInput
-        placeholder="Find your friends"
+        style={{fontSize: 20, marginVertical: 10, marginHorizontal: 20}}
+        placeholder="Search for friends"
         onChangeText={(text) => { setSearchStr(text) }}
         value={searchStr}
       />
 
-      {users.map((user) => {
-        return (
-          <View key={user.user_id}>
-            <Text style={{marginVertical: 10}} key={user.user_id}>{user.family_name} {user.given_name} {user.email}</Text>
-            <Button title={`Add ${user.given_name} as contact`} onPress={() => {
-              fetch(ADD_CONTACT(user.user_id), {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Authorization': token
-                },
-              })
-                // Server just replies OK 200
-                .then(data => {
-                  console.log(data)
+      <ScrollView style={{ flex: 1, marginHorizontal: 20, }}>
+        {users.map((user) => {
+          return (
+            <View key={user.user_id}>
+              <Text style={{ marginVertical: 10 }} key={user.user_id}>{user.family_name} {user.given_name} {user.email}</Text>
+              <Button title={`Add ${user.given_name} as contact`} onPress={() => {
+                console.log('Add contact')
+                fetch(ADD_CONTACT(user.user_id), {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization': userToken
+                  },
                 })
-                .catch(error => {
-                  console.error('Error:', error);
-                });
-            }} />
-          </View>
-        )
-      })}
-
-      <Text
-        onPress={() => navigation.back()}
-      >
-        Go back
-      </Text>
+                  // Server just replies OK 200
+                  .then(data => {
+                    console.log(data)
+                  })
+                  .catch(error => {
+                    console.error('Error:', error);
+                  });
+              }} />
+            </View>
+          )
+        })}
+      </ScrollView>
     </View>
   );
 
