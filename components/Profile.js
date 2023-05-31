@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
+import { View, Button } from 'react-native';
 import { AuthContext } from '../App';
-import {GET_USER} from '../config'
+import {GET_USER, UPDATE_USER} from '../config'
+import TextInput from './subcomponents/TextInput.js'
 
-const Profile = ({navigation}) => {
+const Profile = () => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -29,18 +30,21 @@ const Profile = ({navigation}) => {
   }, []);
 
   return (
-    <View>
+    <View style={{padding: 20}}>
       <TextInput
+        marginTop={100}
         placeholder="Your first name"
         onChangeText={(text) => { setFirstName(text) }}
         value={firstName}
       />
       <TextInput
+        marginTop={20}
         placeholder="Your last name"
         onChangeText={(text) => { setLastName(text) }}
         value={lastName}
       />
       <TextInput
+        marginTop={20}
         placeholder="Your email"
         onChangeText={(text) => { setEmail(text) }}
         value={email}
@@ -50,13 +54,13 @@ const Profile = ({navigation}) => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'X-Authorization': token
+            'X-Authorization': userToken,
           },
           body: JSON.stringify({
             first_name: firstName,
             last_name: lastName,
             email,
-            //TODO: password
+            // TODO: password?
           }),
         })
           // Server returns 200 OK
@@ -64,19 +68,12 @@ const Profile = ({navigation}) => {
             console.log('Response:', data);
           })
           .catch(error => {
-            console.error('Error:', error);
+            console.error('Error:', JSON.stringify(error));
           });
       }}
       />
-
-      <Text
-        onPress={() => navigation.back()}
-      >
-        Go back
-      </Text>
     </View>
   );
-
 }
 
 export default Profile;
