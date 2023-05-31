@@ -238,31 +238,11 @@ const Chat = ({ navigation }) => {
           sendMessage()
         }} />
 
-      <TextInput
-        placeholder="Your message"
-        onChangeText={(text) => { setMessage(text) }}
-        value={message}
-      />
-
-      <Button disabled={!message} title={`Send message`} onPress={() => {
-        fetch(SEND_MESSAGE(chatId), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Authorization': token
-          },
-          body: JSON.stringify({
-            message: message
-          })
-        })
-          // Server just replies OK 200
-          .then(data => {
-            // console.log(data)
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
-      }} />
+        <Button disabled={!message} title={`Send message in an hour`} onPress={() => {
+          setTimeout(sendMessage, 60*60*1000)
+          setMessage('')
+          storeData('')
+        }} />
 
       </View>
     </View>
