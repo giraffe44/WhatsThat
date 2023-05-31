@@ -1,5 +1,5 @@
 import React, { useContext, createContext } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, View, Button } from 'react-native';
 
@@ -36,17 +36,17 @@ const AuthContext = createContext(null);
 export { AuthContext };
 
 //Initial State and Actions
-const initialState = {
-  isUserLoggedIn: true,
-  userId: 1,
-  userToken: 'ff4378cceda85c0480be8cd378a0aaae',
-};
-
 // const initialState = {
-//   isUserLoggedIn: false,
-//   userId: null,
-//   userToken: null,
+//   isUserLoggedIn: true,
+//   userId: 2,
+//   userToken: '3eebf0a3e0a88c5432911a3dbb0bd1df',
 // };
+
+const initialState = {
+  isUserLoggedIn: false,
+  userId: null,
+  userToken: null,
+};
 
 
 const actions = {
@@ -82,7 +82,6 @@ const Provider = ({ children }) => {
   const value = {
     ...state,
     userLogin: (payload) => {
-      console.log('userLogin', payload, payload.userToken)
       dispatch({ type: actions.USER_LOGIN, payload });
     },
     userLogout: () => {
@@ -98,56 +97,66 @@ const Provider = ({ children }) => {
 };
 
 const Header = ({ navigation }) => {
-  const { userToken, userId, userLogout } = useContext(AuthContext);
+  const { userToken, userId, isUserLoggedIn, userLogout } = useContext(AuthContext);
+  const route = useRoute();
 
   return (
-    <View style={{ flexDirection: 'row', height: 50, backgroundColor: '#ddd' }}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 50, backgroundColor: '#ddd' }}>
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <Text style={{ color: '#333', fontSize: 20, marginLeft: 10 }} onPress={() => navigation.goBack()}> Back </Text>
       </View>
-      {userId && <UserPhoto userId={userId} />}
-      <Button color={'#999'} title="LogOut" onPress={() => {
-        fetch(LOGOUT, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Authorization': userToken
-          },
-        })
-          .then(() => {
-            userLogout()
-            navigation.push('Login')
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
-      }}
-      />
+      <View style={{ flex: 1, justifyContent: 'center', fontSize: 20 }}>
+        <Text>{route.name}</Text>
+      </View>
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View>
+          {userId && <UserPhoto userId={userId} navigation={navigation} />}
+        </View>
+        <View>
+          {isUserLoggedIn && (
+            <Button color={'#999'} title="LogOut" onPress={() => {
+              fetch(LOGOUT, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Authorization': userToken
+                },
+              })
+                .then(() => {
+                  userLogout()
+                  navigation.push('Login')
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+            }}
+            />
+          )}
+        </View>
+      </View>
     </View>
   )
-
 }
 
 const App = () => {
   return (
     <Provider>
-      <NavigationContainer linking={linking}>
-        <Stack.Navigator screenOptions={{
-          header: ({navigation})=> <Header navigation={navigation} />
-        }}>
-          <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
-          <Stack.Screen name="Signup" component={Signup} options={{ title: 'Signup' }} />
-          <Stack.Screen name="Profile" component={Profile} options={{ title: 'Your profile' }} />
-          <Stack.Screen name="ContactsList" component={ContactsList} options={{ title: 'Start a new chat' }} />
-          <Stack.Screen name="Search" component={Search} options={{ title: 'Find your friends' }} />
-          <Stack.Screen name="ChatList" component={ChatList} options={{ title: 'Your chats' }} />
-          <Stack.Screen name="Chat" component={Chat} options={{ title: 'Chat' }} />
-          <Stack.Screen name="UploadPhoto" component={UploadPhoto} options={{ title: 'Upload Your Photo' }} />
-          {/*
-            <Stack.Screen name="BlockedUsers" component={BlockedUsers} options={{ title: 'Blocked contacts' }} />
-          */}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <View style={{ flex: 1, paddingTop: 60, backgroundColor: '#eee' }}>
+        <NavigationContainer linking={linking}>
+          <Stack.Navigator screenOptions={{
+            header: ({ navigation }) => <Header navigation={navigation} />
+          }}>
+            <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
+            <Stack.Screen name="Signup" component={Signup} options={{ title: 'Signup' }} />
+            <Stack.Screen name="Profile" component={Profile} options={{ title: 'Your profile' }} />
+            <Stack.Screen name="ContactsList" component={ContactsList} options={{ title: 'Add user to a chat' }} />
+            <Stack.Screen name="Search" component={Search} options={{ title: 'Find your friends' }} />
+            <Stack.Screen name="ChatList" component={ChatList} options={{ title: 'Your chats' }} />
+            <Stack.Screen name="Chat" component={Chat} options={{ title: 'Chat' }} />
+            <Stack.Screen name="UploadPhoto" component={UploadPhoto} options={{ title: 'Upload Your Photo' }} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </View>
     </Provider>
   );
 }
