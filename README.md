@@ -6,3 +6,4 @@ so I have decided to split the commit file by file to show what each commit did 
 how to run app: npm run web or npm run android
 the whatsthat app behaves similar to whatsapp and similar messenger apps. 
 
+had an issue with expo camera on web, so installed node_modules using yarn and it was fixed.
